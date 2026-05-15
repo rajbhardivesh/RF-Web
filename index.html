@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RF Hunter // Cybersecurity Device</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;500;700&family=Orbitron:wght@400;700;900&display=swap');
+
+  :root {
+    --bg:       #090b0e;
+    --bg2:      #0d1117;
+    --bg3:      #111820;
+    --border:   #1e2d3d;
+    --accent:   #00e5ff;
+    --accent2:  #ff3c5f;
+    --accent3:  #7fff00;
+    --text:     #c9d1d9;
+    --dim:      #4a5568;
+    --glow:     0 0 18px rgba(0,229,255,0.35);
+    --glow2:    0 0 18px rgba(255,60,95,0.35);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── scanline overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── noise grain ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 998;
+    opacity: 0.4;
+  }
+
+  /* ── grid lines bg ── */
+  .page-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    position: relative;
+  }
+
+  .hero {
+    padding: 40px 0 32px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding: 32px 0 24px;
+    }
+  }
+
+  .hero-eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-eyebrow::before {
+    content: '🛡 ';
+    font-size: 14px;
+    color: var(--accent);
+  }
+
+  .hero-eyebrow::after {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+    box-shadow: var(--glow);
+  }
+
+  .hero h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(36px, 7vw, 72px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .hero h1 span {
+    color: var(--accent);
+    text-shadow: var(--glow);
+  }
+
+  .hero-sub {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(12px, 2vw, 16px);
+    color: var(--dim);
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    margin-bottom: 28px;
+  }
+
+  .hero-desc {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--text);
+    max-width: 580px;
+    line-height: 1.7;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 28px;
+  }
+
+  .tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(201,209,217,0.05);
+    transition: all 0.3s;
+    border-radius: 2px;
+  }
+
+  .tag:hover {
+    background: rgba(201,209,217,0.12);
+    transform: translateY(-1px);
+  }
+
+  .tag.hot {
+    border-color: var(--accent2);
+    color: #fff;
+    background: rgba(255,60,95,0.15);
+    box-shadow: var(--glow2);
+    font-weight: 600;
+  }
+
+  .tag.hot:hover {
+    background: rgba(255,60,95,0.25);
+    box-shadow: 0 0 40px rgba(255,60,95,0.5);
+  }
+
+  .tag.go {
+    border-color: var(--accent3);
+    color: var(--accent3);
+    background: rgba(127,255,0,0.08);
+    font-weight: 600;
+  }
+
+  .tag.go:hover {
+    background: rgba(127,255,0,0.15);
+    box-shadow: 0 0 20px rgba(127,255,0,0.3);
+  }
+
+  .tag::before {
+    font-size: 13px;
+  }
+
+  .tag i {
+    margin-right: 6px;
+    font-size: 12px;
+  }
+
+  .hero-content { flex: 1; }
+  .hero-carousel-wrap { flex: 1; }
+
+  /* ── CAROUSEL ── */
+  .carousel-container {
+    position: relative;
+    background: var(--bg2);
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    box-shadow: 0 0 24px rgba(0,229,255,0.2);
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 24px rgba(0,229,255,0.2); }
+    50% { box-shadow: 0 0 40px rgba(0,229,255,0.4); }
+  }
+
+  .carousel-slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .carousel-slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  }
+
+  .carousel-slide.active { opacity: 1; }
+
+  .carousel-slide img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(0,229,255,0.3));
+  }
+
+  .carousel-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--dim);
+    font-size: 48px;
+  }
+
+  .carousel-controls {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+  }
+
+  .carousel-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--dim);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .carousel-dot.active {
+    background: var(--accent);
+    box-shadow: var(--glow);
+    width: 20px;
+    border-radius: 4px;
+  }
+
+  .carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,229,255,0.1);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 8;
+    border-radius: 2px;
+  }
+
+  .carousel-nav:hover {
+    background: rgba(0,229,255,0.2);
+    box-shadow: var(--glow);
+  }
+
+  .carousel-nav.prev { left: 12px; }
+  .carousel-nav.next { right: 12px; }
+
+  /* ── SECTION HEADER ── */
+  .section {
+    padding: 52px 0 0;
+  }
+
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--border), transparent);
+  }
+
+  /* ── HARDWARE GRID ── */
+  .hw-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 0;
+  }
+
+  .hw-item {
+    background: var(--bg2);
+    padding: 20px 18px;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .hw-item:hover { background: var(--bg3); }
+
+  .hw-item .hw-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .hw-item .hw-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .hw-item .hw-note {
+    font-size: 13px;
+    color: var(--dim);
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* ── FEATURE BLOCKS ── */
+  .feature-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) { .feature-list { grid-template-columns: 1fr; } }
+
+  .feature-block {
+    background: var(--bg2);
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+
+  .feature-block:hover { background: var(--bg3); }
+
+  .feature-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+  }
+
+  .feature-block.blue::before  { background: var(--accent);  box-shadow: var(--glow);  }
+  .feature-block.red::before   { background: var(--accent2); box-shadow: var(--glow2); }
+  .feature-block.green::before { background: var(--accent3); box-shadow: 0 0 12px rgba(127,255,0,0.4); }
+  .feature-block.yellow::before{ background: #ffd700;        box-shadow: 0 0 12px rgba(255,215,0,0.4); }
+
+  .feature-icon {
+    font-size: 22px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .feature-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .feature-body {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  .feature-body ul {
+    margin: 8px 0 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .feature-body ul li {
+    padding: 3px 0 3px 16px;
+    position: relative;
+    font-size: 14px;
+  }
+
+  .feature-body ul li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ── MODULE FLOW ── */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .flow-item {
+    flex: 1;
+    min-width: 120px;
+    padding: 18px 16px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .flow-item:last-child { border-right: none; }
+  .flow-item:hover { background: var(--bg3); }
+
+  .flow-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    margin-bottom: 6px;
+  }
+
+  .flow-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .flow-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--dim);
+    line-height: 1.5;
+  }
+
+  /* ── AUDIENCE CARDS ── */
+  .audience-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  @media (max-width: 640px) { .audience-row { grid-template-columns: 1fr; } }
+
+  .aud-card {
+    border: 1px solid var(--border);
+    padding: 24px 20px;
+    background: var(--bg2);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .aud-card:hover {
+    background: var(--bg3);
+    border-color: var(--accent);
+  }
+
+  .aud-role {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .aud-card.buyer  .aud-role { color: var(--accent3); }
+  .aud-card.researcher .aud-role { color: var(--accent); }
+  .aud-card.tester .aud-role { color: var(--accent2); }
+
+  .aud-points {
+    list-style: none;
+    padding: 0; margin: 0;
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text);
+  }
+
+  .aud-points li {
+    padding: 5px 0 5px 18px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .aud-card.buyer      .aud-points li::before { content: '✓'; position: absolute; left: 0; color: var(--accent3); font-weight: 700; }
+  .aud-card.researcher .aud-points li::before { content: '·'; position: absolute; left: 0; color: var(--accent);  font-size: 20px; line-height: 14px; }
+  .aud-card.tester     .aud-points li::before { content: '!'; position: absolute; left: 0; color: var(--accent2); font-weight: 700; }
+
+  /* ── WARNING BOX ── */
+  .warning-box {
+    border: 1px solid var(--accent2);
+    background: rgba(255,60,95,0.05);
+    padding: 20px 24px;
+    margin-top: 48px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .warning-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .warning-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .warning-body {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  /* ── FOOTER ── */
+  .doc-footer {
+    margin-top: 64px;
+    padding: 32px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .footer-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .footer-content {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+
+  .footer-section {
+    padding: 16px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    border-radius: 2px;
+  }
+
+  .footer-section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer-section-title::before {
+    font-size: 16px;
+  }
+
+  .footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-links li {
+    margin: 8px 0;
+  }
+
+  .footer-links a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+  }
+
+  .footer-links a:hover {
+    color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-bottom .brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+  }
+
+  .footer-bottom .brand span { color: var(--accent); }
+
+  .footer-bottom .meta {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.15em;
+  }
+
+  /* ── BUY NOW BUTTON ── */
+  .btn-buy-now {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent2), #ff1744);
+    border: 2px solid var(--accent2);
+    color: #fff;
+    padding: 14px 32px;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 24px rgba(255,60,95,0.3);
+    border-radius: 2px;
+    margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-buy-now:hover {
+    box-shadow: 0 0 40px rgba(255,60,95,0.6);
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #ff1744, var(--accent2));
+  }
+
+  /* ── BLINK CURSOR ── */
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .cursor { display: inline-block; width: 8px; height: 14px; background: var(--accent); vertical-align: middle; animation: blink 1s step-end infinite; margin-left: 4px; }
+
+  /* ── FADE IN ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+  .hero, .section { animation: fadeUp 0.5s ease both; }
+  .section:nth-child(2){animation-delay:.1s}
+  .section:nth-child(3){animation-delay:.18s}
+  .section:nth-child(4){animation-delay:.26s}
+  .section:nth-child(5){animation-delay:.34s}
+  .section:nth-child(6){animation-delay:.42s}
+  .section:nth-child(7){animation-delay:.5s}
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 1200px) {
+    .page-wrap { max-width: 100%; padding: 0 16px 60px; }
+    .hw-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .audience-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    :root { --text: #c9d1d9; }
+    .page-wrap { padding: 0 12px 40px; }
+    .hero { padding: 24px 0 16px; }
+    .hero h1 { font-size: clamp(28px, 8vw, 48px); }
+    .hero-sub { font-size: clamp(10px, 2vw, 14px); }
+    .hero-desc { font-size: 16px; }
+    .hw-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0; }
+    .hw-item { padding: 16px 12px; }
+    .feature-list { grid-template-columns: 1fr; gap: 1px; }
+    .feature-block { padding: 20px 16px; }
+    .feature-title { font-size: 12px; }
+    .feature-body { font-size: 13px; }
+    .audience-row { grid-template-columns: 1fr; }
+    .btn-buy-now { width: 100%; justify-content: center; padding: 16px 24px; font-size: 12px; margin-top: 16px; }
+    .flow { flex-direction: column; }
+    .flow-item { border-right: none; border-bottom: 1px solid var(--border); }
+    .flow-item:last-child { border-bottom: none; }
+    .carousel-container { aspect-ratio: auto; height: 300px; }
+    .carousel-nav { width: 36px; height: 36px; }
+    .footer-content { grid-template-columns: 1fr; gap: 16px; }
+    .footer-section { padding: 12px; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-tags { flex-direction: column; }
+    .tag { width: 100%; text-align: center; padding: 8px 12px; font-size: 10px; }
+    .tag i { margin-right: 4px; }
+    .hw-grid { grid-template-columns: 1fr; }
+    .hw-item { padding: 12px 10px; }
+    .hero h1 { font-size: clamp(24px, 6vw, 36px); }
+    .carousel-container { height: 240px; }
+    .carousel-controls { bottom: 12px; gap: 6px; }
+    .carousel-dot { width: 6px; height: 6px; }
+    .carousel-dot.active { width: 16px; }
+    .carousel-nav { width: 32px; height: 32px; font-size: 14px; }
+    .hero-carousel-wrap { margin-top: 24px; }
+    .flow { padding: 12px; }
+    .flow-item { padding: 12px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- ══ HERO ══════════════════════════════════════════════ -->
+  <header class="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow"><i class="fas fa-shield-alt"></i> @rdhrobotics // cybersecurity</div>
+      <h1>RF<span>-Hunter</span></h1>
+      <div class="hero-sub">Wireless Penetration Research Platform<span class="cursor"></span></div>
+      <p class="hero-desc">
+        A compact, self-contained ESP8266 + nRF24L01 device with OLED display and hardware keypad.
+        Three independent tools — RF jammer, Wi-Fi deauther, and captive portal harvester —
+        unified under a single launcher UI. Built for hands-on wireless security research.
+      </p>
+      <div class="hero-tags">
+        <span class="tag hot">⚡ Standalone — No Laptop</span>
+        <span class="tag hot">🔓 Open Firmware</span>
+        <span class="tag">📱 Pocket-Sized</span>
+        <span class="tag">🖥️ Web + OLED Dual UI</span>
+        <span class="tag go">👻 Evil Twin AP Clone</span>
+        <span class="tag go">🚫 Deauth Attack Engine</span>
+        <span class="tag">🎣 Captive Portal Phish</span>
+        <span class="tag hot">📡 BLE + Zigbee + Wi-Fi Jam</span>
+      </div>
+      <a href="https://rdhrobotics.in" class="btn-buy-now" target="_blank">
+        🛒 BUY NOW
+      </a>
+    </div>
+
+    <div class="hero-carousel-wrap">
+      <div class="carousel-container">
+        <div class="carousel-slides" id="carouselSlides">
+          <div class="carousel-slide active">
+            <div class="carousel-placeholder">
+              <i class="fas fa-microchip"></i>
+              <p style="margin-top: 16px; text-align: center; font-size: 14px;">ESP8266 + nRF24L01</p>
+            </div>
+          </div>
+          <div class="carousel-slide">
+            <div class="carousel-placeholder">
+              <i class="fas fa-wifi"></i>
+              <p style="margin-top: 16px; text-align: center; font-size: 14px;">Wi-Fi Deauther</p>
+            </div>
+          </div>
+          <div class="carousel-slide">
+            <div class="carousel-placeholder">
+              <i class="fas fa-lock"></i>
+              <p style="margin-top: 16px; text-align: center; font-size: 14px;">Captive Portal</p>
+            </div>
+          </div>
+          <div class="carousel-slide">
+            <div class="carousel-placeholder">
+              <i class="fas fa-bolt"></i>
+              <p style="margin-top: 16px; text-align: center; font-size: 14px;">RF Jammer Mode</p>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-controls">
+          <div class="carousel-dot active" onclick="goToSlide(0)"></div>
+          <div class="carousel-dot" onclick="goToSlide(1)"></div>
+          <div class="carousel-dot" onclick="goToSlide(2)"></div>
+          <div class="carousel-dot" onclick="goToSlide(3)"></div>
+        </div>
+        <div class="carousel-nav prev" onclick="prevSlide()"><i class="fas fa-chevron-left"></i></div>
+        <div class="carousel-nav next" onclick="nextSlide()"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ HARDWARE ══════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-label">01 // Hardware</div>
+    <div class="hw-grid">
+      <div class="hw-item">
+        <div class="hw-label">MCU</div>
+        <div class="hw-value">ESP8266</div>
+        <div class="hw-note">80/160 MHz, 2.4 GHz Wi-Fi, WIFI_AP_STA mode</div>
+      </div>
+      <div class="hw-item">
+        <div class="hw-label">RF Module</div>
+        <div class="hw-value">nRF24L01+</div>
+        <div class="hw-note">2.4 GHz, 125 channels, 2 Mbps, PA+LNA variant</div>
+      </div>
+      <div class="hw-item">
+        <div class="hw-label">Display</div>
+        <div class="hw-value">SH1106</div>
+        <div class="hw-note">128×64 OLED, I²C, 0.96"</div>
+      </div>
+      <div class="hw-item">
+        <div class="hw-label">Input</div>
+        <div class="hw-value">ADC Keypad</div>
+        <div class="hw-note">6-button voltage-divider — UP DOWN LEFT RIGHT ENTER BACK</div>
+      </div>
+      <div class="hw-item">
+        <div class="hw-label">Storage</div>
+        <div class="hw-value">EEPROM</div>
+        <div class="hw-note">Persistent PW vault, survives power cycle</div>
+      </div>
+      <div class="hw-item">
+        <div class="hw-label">Pins (nRF)</div>
+        <div class="hw-value">CE 16 / CSN 15</div>
+        <div class="hw-note">OLED SDA 4 / SCL 5</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ LAUNCHER ══════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-label">02 // Launcher — Three-Tool Architecture</div>
+    <div class="flow">
+      <div class="flow-item">
+        <div class="flow-num">MODE 01</div>
+        <div class="flow-name">RF-Hunter</div>
+        <div class="flow-desc">nRF24 constant carrier jammer. BLE + all 2.4 GHz or Wi-Fi channels only.</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">MODE 02</div>
+        <div class="flow-name">Deauther Suite</div>
+        <div class="flow-desc">spacehuhn esp8266_deauther engine. Scan, select, deauth, beacon flood, probe attack.</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">MODE 03</div>
+        <div class="flow-name">WiPhi</div>
+        <div class="flow-desc">Deauth + EvilTwin + captive portal credential harvester with EEPROM vault.</div>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--dim);margin-top:12px;font-family:'Share Tech Mono',monospace;">
+      Hold BACK 5 seconds from any mode → returns to launcher main menu. Each tool initialises and tears down its own WiFi stack independently.
+    </p>
+  </section>
+
+  <!-- ══ FEATURE DEEP DIVE ══════════════════════════════════ -->
+  <section class="section">
+    <div class="section-label">03 // Feature Deep Dive</div>
+    <div class="feature-list">
+
+      <div class="feature-block blue">
+        <span class="feature-icon">📡</span>
+        <div class="feature-title">RF-Hunter — 2.4 GHz Jammer</div>
+        <div class="feature-body">
+          Uses nRF24L01 constant carrier mode to saturate the 2.4 GHz band.
+          <ul>
+            <li>Full sweep: all 125 channels (BLE, Zigbee, Wi-Fi, proprietary)</li>
+            <li>Targeted sweep: Wi-Fi channels 1–11 only (2412–2462 MHz)</li>
+            <li>RF24_PA_MAX + RF24_2MBPS for maximum interference power</li>
+            <li>CRC disabled, AutoAck off — pure carrier output</li>
+            <li>Plug-in mode table: add new attack modes with 3 lines of code</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feature-block red">
+        <span class="feature-icon">⚡</span>
+        <div class="feature-title">Deauther Suite</div>
+        <div class="feature-body">
+          Full spacehuhn deauther engine integrated as a launcher mode.
+          <ul>
+            <li>Scan nearby APs and stations</li>
+            <li>Targeted deauthentication (802.11 type C0/A0 frames)</li>
+            <li>Beacon flood and probe attack</li>
+            <li>Web UI at 192.168.4.1 for remote control</li>
+            <li>CLI over Serial for scripting</li>
+            <li>LittleFS config persistence, autosave</li>
+            <li>OLED display driven by DisplayUI module</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feature-block yellow">
+        <span class="feature-icon">🎣</span>
+        <div class="feature-title">WiPhi — Captive Portal Harvester</div>
+        <div class="feature-body">
+          EvilTwin AP clones the target SSID, serves a convincing firmware-update phishing page to connected victims.
+          <ul>
+            <li>Scans and lists up to 16 nearby APs with channel + RSSI</li>
+            <li>One-click AP select → deauth target → victim reconnects to clone</li>
+            <li>Captive portal hijacks all HTTP traffic via DNSServer wildcard</li>
+            <li>Password verification: attempts real WPA2 auth to confirm</li>
+            <li>OLED shows live client count + packet count</li>
+            <li>Auto-jumps to Captured screen on success</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feature-block green">
+        <span class="feature-icon">💾</span>
+        <div class="feature-title">EEPROM Password Vault</div>
+        <div class="feature-body">
+          Captured credentials persist across power cycles.
+          <ul>
+            <li>5 slots — SSID (32 bytes) + password (64 bytes) each</li>
+            <li>Magic byte detects first boot, auto-formats on corruption</li>
+            <li>WiPhi vault offset at 2000+ to avoid deauther EEPROM collision</li>
+            <li>OLED browse: scroll list of saved entries</li>
+            <li>Per-slot delete: BACK button on detail screen</li>
+            <li>Web admin panel also displays captured password</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feature-block blue">
+        <span class="feature-icon">🖥️</span>
+        <div class="feature-title">OLED UI — Unified Design</div>
+        <div class="feature-body">
+          All three tools share the same UI language: inverted title bar, arrow-only cursor, no fill on selected items.
+          <ul>
+            <li>128×64 px, ArialMT_Plain_10 font</li>
+            <li>Title bar: filled rect, white-on-black centred label</li>
+            <li>Menu cursor: ">" prefix only — no invert, no fill</li>
+            <li>Scrollable lists with ^ / v indicators</li>
+            <li>Live status: deauth packet counter, client count</li>
+            <li>Animated scan progress bar during WiFi scan</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feature-block red">
+        <span class="feature-icon">🌐</span>
+        <div class="feature-title">Web Admin UI</div>
+        <div class="feature-body">
+          Parallel web interface — works simultaneously with OLED. Connect to WiPhi_34732 (pass: d347h320) then open 192.168.4.1/admin.
+          <ul>
+            <li>AP scan table with Select button per entry</li>
+            <li>Start/Stop Deauth and EvilTwin buttons</li>
+            <li>Live captured password display</li>
+            <li>Victim-facing: convincing router firmware-update page</li>
+            <li>Wrong PW: 4-second redirect, try again loop</li>
+            <li>Correct PW: 15-second verification progress bar</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ RF CHAT BONUS ══════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-label">04 // Bonus Tool — RF Chat</div>
+    <div class="feature-list">
+      <div class="feature-block blue">
+        <span class="feature-icon">💬</span>
+        <div class="feature-title">nRF24 Mesh Chat</div>
+        <div class="feature-body">
+          Standalone sketch. Point-to-point or group text chat over raw nRF24 radio. No Wi-Fi, no internet.
+          <ul>
+            <li>5-digit Room ID → shared nRF24 pipe address</li>
+            <li>3-char username selection on-device</li>
+            <li>Split OLED: left = message log, right = on-screen keyboard</li>
+            <li>2-page keyboard: letters / numbers + emoji (:) :( ;) :D)</li>
+            <li>Join/leave packets broadcast to all devices on same room ID</li>
+            <li>Up to N devices per room — no pairing, no handshake</li>
+          </ul>
+        </div>
+      </div>
+      <div class="feature-block green">
+        <span class="feature-icon">📻</span>
+        <div class="feature-title">RF Chat — Technical</div>
+        <div class="feature-body">
+          32-byte packet format over nRF24, channel 90 (outside common Wi-Fi interference).
+          <ul>
+            <li>Packet: [type 1B] [name 3B] [text 28B]</li>
+            <li>Types: M=message, J=join, L=leave</li>
+            <li>Pipe address derived from Room ID: 'R' + first 4 digits</li>
+            <li>RF24_1MBPS, CRC_8, PA_MAX</li>
+            <li>Keyboard: 7 cols × 4 rows + action row [MNU][SND][DEL]</li>
+            <li>BACK button = instant delete, no keyboard navigation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ AUDIENCE ══════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-label">05 // Who Is This For</div>
+    <div class="audience-row">
+
+      <div class="aud-card buyer">
+        <div class="aud-role">Buyers</div>
+        <ul class="aud-points">
+          <li>Ready-to-use hardware, no soldering required</li>
+          <li>Three tools in one device — RF jammer, deauther, harvester</li>
+          <li>Standalone — no laptop, no phone needed</li>
+          <li>Pocket-sized, battery-friendly</li>
+          <li>Web interface for remote operation</li>
+          <li>EEPROM stores results after power-off</li>
+          <li>Open firmware — fully hackable</li>
+        </ul>
+      </div>
+
+      <div class="aud-card researcher">
+        <div class="aud-role">Researchers</div>
+        <ul class="aud-points">
+          <li>Full source — every layer visible and modifiable</li>
+          <li>Plugin table for RF modes: add in 3 steps</li>
+          <li>Launcher AppMode enum: drop in new tools cleanly</li>
+          <li>Promiscuous / scan mode handled correctly (no conflict)</li>
+          <li>EEPROM layout documented, WiPhi offset avoids deauther region</li>
+          <li>Dual-stack: OLED + Web run simultaneously</li>
+          <li>spacehuhn deauther engine intact and unmodified</li>
+        </ul>
+      </div>
+
+      <div class="aud-card tester">
+        <div class="aud-role">Testers</div>
+        <ul class="aud-points">
+          <li>Animated scan progress — see it working in real time</li>
+          <li>Live deauth packet counter on OLED</li>
+          <li>Live client count on EvilTwin AP</li>
+          <li>Auto-jump to Captured screen on credential harvest</li>
+          <li>Hold BACK 5s = safe exit from any mode</li>
+          <li>Wrong PW loop with redirect — test portal flow</li>
+          <li>Serial output on all critical events</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ WARNING ══════════════════════════════════════════ -->
+  <div class="warning-box">
+    <div class="warning-icon">⚠</div>
+    <div>
+      <div class="warning-title">Legal Notice // Authorized Use Only</div>
+      <div class="warning-body">
+        This device is designed for <strong>authorized security research, penetration testing, and educational use only</strong>.
+        Using deauthentication attacks, RF jamming, or credential harvesting against networks or devices you do not own
+        or have explicit written permission to test is <strong>illegal in most jurisdictions</strong> and may result in
+        criminal prosecution. The author assumes no liability for misuse.
+        Always operate within the law and with the informed consent of all affected parties.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══════════════════════════════════════════ -->
+  <footer class="doc-footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <div class="footer-section-title">
+          💻 Source Code
+        </div>
+        <ul class="footer-links">
+          <li><a href="https://github.com/rdhrobotics" target="_blank">🐙 GitHub Repository</a></li>
+          <li><a href="https://github.com/rdhrobotics/RF-Hunter" target="_blank">🔧 RF-Hunter Firmware</a></li>
+          <li><a href="https://github.com/rdhrobotics" target="_blank">📦 View All Projects</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <div class="footer-section-title">
+          🔗 Connect With Us
+        </div>
+        <ul class="footer-links">
+          <li><a href="https://instagram.com/rdhrobotics" target="_blank">📸 Instagram @rdhrobotics</a></li>
+          <li><a href="https://rdhrobotics.in" target="_blank">🌐 Website</a></li>
+          <li><a href="https://rdhrobotics.in" target="_blank">🛒 Buy Now</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <div class="footer-section-title">
+          ℹ️ Information
+        </div>
+        <ul class="footer-links">
+          <li><a href="#"><📄 Documentation</a></li>
+          <li><a href="#"><📚 Wiki Guide</a></li>
+          <li><a href="#"><❓ FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="brand">RF<span>-Hunter</span> // Cybersecurity Research Device</div>
+      <div class="meta">© 2024 RDH Robotics • @rdhrobotics • www.rdhrobotics.in</div>
+    </div>
+  </footer>
+
+</div>
+<script>
+  // Carousel functionality
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots = document.querySelectorAll('.carousel-dot');
+  const totalSlides = slides.length;
+
+  function showSlide(n) {
+    slides.forEach(slide => slide.classList.remove('active'));
+    dots.forEach(dot => dot.classList.remove('active'));
+    
+    slides[n].classList.add('active');
+    dots[n].classList.add('active');
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    showSlide(currentSlide);
+  }
+
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    showSlide(currentSlide);
+  }
+
+  function goToSlide(n) {
+    currentSlide = n;
+    showSlide(currentSlide);
+  }
+
+  // Auto-rotate carousel every 5 seconds
+  setInterval(nextSlide, 5000);
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
